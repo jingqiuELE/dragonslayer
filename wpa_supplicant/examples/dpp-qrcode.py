@@ -37,6 +37,7 @@ def wpas_connect():
             wpas = wpaspy.Ctrl(ctrl)
             return wpas
         except Exception as e:
+            print(e)
             pass
     return None
 
@@ -107,6 +108,13 @@ def dpp_display(curve):
         print("ID=%d" % id)
         del wpas
 
+def dpp_show(uri):
+        print(uri)
+        qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M,
+                           border=3)
+        qr.add_data(uri, optimize=5)
+        qr.print_ascii(tty=True)
+
 def main():
     parser = argparse.ArgumentParser(description='Android logcat to wpa_supplicant integration for DPP QR Code operations')
     parser.add_argument('-d', const=logging.DEBUG, default=logging.INFO,
@@ -114,8 +122,10 @@ def main():
                         help='verbose debug output')
     parser.add_argument('--curve', '-c',
                         help='set a specific curve (P-256, P-384, P-521, BP-256R1, BP-384R1, BP-512R1) for key generation')
+    parser.add_argument('--uri', '-u', help='the bootstrap uri of a dpp respondor' )
     parser.add_argument('command', choices=['logcat',
-                                            'display'],
+                                            'display',
+                                            'show'],
                         nargs='?')
     args = parser.parse_args()
 
@@ -125,6 +135,8 @@ def main():
         dpp_logcat()
     elif args.command == "display":
         dpp_display(args.curve)
+    elif args.command == "show":
+        dpp_show(args.uri)
 
 if __name__ == '__main__':
     main()
